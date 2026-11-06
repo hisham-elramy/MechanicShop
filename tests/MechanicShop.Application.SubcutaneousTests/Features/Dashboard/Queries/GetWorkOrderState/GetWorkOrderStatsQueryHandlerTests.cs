@@ -231,7 +231,7 @@ public class GetWorkOrderStatsQueryHandlerTests(WebAppFactory factory)
 
     private static DateOnly UniqueDate()
     {
-        return DateOnly.FromDateTime(DateTime.UtcNow.Date.AddDays(Random.Shared.Next(30, 5000)));
+        return DateOnly.FromDateTime(DateTime.UtcNow.Date.AddDays(Random.Shared.Next(30, 50000)));
     }
 
     private static DateTimeOffset At(DateOnly date, int hour, int minute = 0)

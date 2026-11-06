@@ -25,5 +25,46 @@ jobs:
     - name: Build solution
       run: dotnet build --configuration Release --no-restore
 
-    - name: Run tests
-      run: dotnet test --configuration Release --no-build --verbosity normal
+    - name: Test Domain Unit Tests
+      id: domain
+      continue-on-error: true
+      run: |
+        dotnet test tests/MechanicShop.Domain.UnitTests/MechanicShop.Domain.UnitTests.csproj -c Release --logger "console;verbosity=detailed" --logger "trx;LogFileName=domain.trx" --results-directory TestResults/Domain
+
+    - name: Test Application Unit Tests
+      id: application
+      continue-on-error: true
+      run: |
+        dotnet test tests/MechanicShop.Application.UnitTests/MechanicShop.Application.UnitTests.csproj -c Release --logger "console;verbosity=detailed" --logger "trx;LogFileName=application.trx" --results-directory TestResults/Application
+
+    - name: Test Application Subcutaneous Tests
+      id: subcutaneous
+      continue-on-error: true
+      run: |
+        dotnet test tests/MechanicShop.Application.SubcutaneousTests/MechanicShop.Application.SubcutaneousTests.csproj -c Release --logger "console;verbosity=detailed" --logger "trx;LogFileName=subcutaneous.trx" --results-directory TestResults/Subcutaneous
+
+    - name: Test API Integration Tests
+      id: api
+      continue-on-error: true
+      run: |
+        dotnet test tests/MechanicShop.Api.IntegrationTests/MechanicShop.Api.IntegrationTests.csproj -c Release --logger "console;verbosity=detailed" --logger "trx;LogFileName=api.trx" --results-directory TestResults/Api
+
+    - name: Upload Test Results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: TestResults/**/*.trx
+        if-no-files-found: warn
+
+    - name: Check Test Results
+      if: always()
+      shell: bash
+      run: |
+        if [[ "${{ steps.domain.outcome }}" != "success" ||
+              "${{ steps.application.outcome }}" != "success" ||
+              "${{ steps.subcutaneous.outcome }}" != "success" ||
+              "${{ steps.api.outcome }}" != "success" ]]; then
+          echo "One or more test projects failed."
+          exit 1
+        fi

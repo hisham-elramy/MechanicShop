@@ -117,7 +117,7 @@ public class TokenProvider(
         var parameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt["Secret"]!)),   // Secret مش Key
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt["Secret"]!)),
             ValidateIssuer = true,
             ValidIssuer = jwt["Issuer"],
             ValidateAudience = true,
